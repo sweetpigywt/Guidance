@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>進学単語 1-48ひらがな練習</title>
+    <style>
+        :root {
+            --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --accent-color: #4a90e2;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { margin: 0; font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', Meiryo, sans-serif; background: var(--primary-bg); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .container { width: 100%; max-width: 500px; background: var(--glass-bg); border-radius: 20px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .hidden { display: none !important; }
+        
+        /* 头部与进度 */
+        .header-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; color: #555; }
+        .progress-container { width: 100%; height: 10px; background: #eee; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--success-color); width: 0%; transition: width 0.3s; }
+
+        /* 题目区域 */
+        .question-box { background: #f8f9fa; padding: 35px 15px; border-radius: 15px; text-align: center; margin-bottom: 25px; border: 1px solid #ddd; }
+        .question-text { font-size: 2.2rem; font-weight: bold; color: #333; }
+        .options-grid { display: grid; gap: 12px; }
+        .option-btn { padding: 16px; background: white; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-size: 1.1rem; transition: 0.1s; text-align: left; line-height: 1.3; }
+        .option-btn.correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; }
+        .option-btn.wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+
+        /* 按钮与表单 */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        .btn-main { display: block; width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--accent-color); color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; margin-top: 15px; }
+        .btn-link { background: #34495e; }
+        .btn-outline { background: #95a5a6; }
+
+        /* 错题本样式 */
+        .mistake-section { margin-top: 25px; border-top: 2px dashed #ccc; padding-top: 20px; }
+        .mistake-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 8px; background: #eee; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.2s; }
+        .tab-btn.active[data-level="3"] { background: var(--danger-color); color: white; }
+        .tab-btn.active[data-level="2"] { background: var(--warning-color); color: white; }
+        .tab-btn.active[data-level="1"] { background: var(--accent-color); color: white; }
+        .mistake-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; padding: 5px; }
+        .mistake-item { background: #fff; border: 1px solid #ddd; padding: 8px; border-radius: 6px; font-size: 0.9rem; text-align: center; cursor: help; }
+
+        /* 结果与分析 */
+        .result-item { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; color: white; margin-right: 8px; font-size: 0.75rem; }
+        .tag-correct { background: var(--success-color); }
+        .tag-wrong { background: var(--danger-color); }
+        .score-big { font-size: 3.5rem; text-align: center; color: var(--accent-color); font-weight: bold; margin: 10px 0; }
+
+        #cheat-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="setup-screen" class="container">
+        <h2 style="text-align:center; margin-top:0;">進学単語 1-48ひらがな練習</h2>
+        <div class="form-group">
+            <label>氏名</label>
+            <input type="text" id="user-name" placeholder="氏名を入力してください" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>学籍番号</label>
+            <input type="text" id="student-id" placeholder="例：S580" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>クラス</label>
+            <select id="class-name">
+                <option value="SP12">SP12</option>
+                <option value="SP13">SP13</option>
+            </select>
+        </div>
+        <button class="btn-main" onclick="startQuiz()">試験開始</button>
+        <a href="https://docs.google.com/spreadsheets/d/1IKGHssYa7BrylPNglti1iNQ4T69UR7TB_bVSNzC1zyQ/edit#gid=1457252475" target="_blank" class="btn-main btn-link">ランキングを見る</a>
+
+        <div class="mistake-section">
+            <div style="text-align:center; font-weight:bold; margin-bottom:10px;">📖 弱点克服（累計ミス記録）</div>
+            <div class="mistake-tabs">
+                <button class="tab-btn active" data-level="3" onclick="switchMistakeTab(3)">🔥 3回以上</button>
+                <button class="tab-btn" data-level="2" onclick="switchMistakeTab(2)">⚠️ 2回</button>
+                <button class="tab-btn" data-level="1" onclick="switchMistakeTab(1)">📖 1回</button>
+            </div>
+            <div id="mistake-list" class="mistake-list">
+                </div>
+            <button class="btn-main btn-outline" onclick="clearHistory()" style="font-size:0.75rem; padding:8px; margin-top:10px;">記録をリセット</button>
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="container hidden">
+        <div class="header-info">
+            <span id="current-q-num">Q 1 / 20</span>
+            <span id="live-score">正解: 0</span>
+        </div>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="question-box">
+            <div class="question-text" id="q-text"></div>
+        </div>
+        <div class="options-grid" id="options-area"></div>
+    </div>
+
+    <div id="result-screen" class="container hidden" style="max-height: 90vh; overflow-y: auto;">
+        <h2 style="text-align:center">試験結果</h2>
+        <div class="score-big" id="final-score">0 / 20</div>
+        <div id="analysis-area"></div>
+        <button class="btn-main" onclick="location.reload()">もう一度受験</button>
+        <a href="https://docs.google.com/spreadsheets/d/1IKGHssYa7BrylPNglti1iNQ4T69UR7TB_bVSNzC1zyQ/edit#gid=1457252475" target="_blank" class="btn-main btn-link">ランキングを確認</a>
+    </div>
+
+    <div id="cheat-overlay" class="hidden">
+        <h1 style="font-size: 4rem; color: var(--danger-color);">失格</h1>
+        <p>画面切り替えが検知されました。<br>試験は無効です。</p>
+        <button class="btn-main" style="width:200px" onclick="location.reload()">戻る</button>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxViOSf-S2fNbseM9FivlqIUw_Gg2TSYkrzo-N1eOUVtpFPgrHRl3rmY3zHGTfTqSSY/exec";
+        const QUESTION_COUNT = 20;
+
+        const wordList = [
+            ["募集要項", "ぼしゅうようこう"], ["入学願書", "にゅうがくがんしょ"], ["調査書", "ちょうさしょ"], ["履歴書", "りれきしょ"], ["経費支弁書", "けいひしべんしょ"], ["志望理由シート", "しぼうりゆうしーと"], ["学校長推薦書", "がっこうちょうすいせんしょ"], ["卒業証明書", "そつぎょうしょうめいしょ"], ["卒業証書", "そつぎょうしょうしょ"], ["成績証明書", "せいせきしょうめいしょ"], ["修了証明書", "しゅうりょうしょうめいしょ"], ["在籍証明書", "ざいせきしょうめいしょ"], ["日本語能力試験成績通知書", "にほんごのうりょくしけんせいせきつうちしょ"], ["日本留学試験成績確認書", "にほんりゅうがくしけんせいせきかくにんしょ"], ["在留カード", "ざいりゅうかーど"], ["パスポート", "ぱすぽーと"], ["受験票", "じゅけんひょう"], ["出願", "しゅつがん"], ["出願資格", "しゅつがんしかく"], ["願書受付期間", "がんしょ　うけつけきかん"], ["締切", "しめきり"], ["必着", "ひっちゃく"], ["持参", "じさん"], ["郵送", "ゆうそう"], ["书留郵便", "かきとめゆうびん"], ["記入", "きにゅう"], ["貼付", "ちょうふ"], ["受理", "じゅり"], ["返却", "へんきゃく"], ["選抜", "せんばつ"], ["選抜方法", "せんばつほうほう"], ["選抜日程", "せんばつにってい"], ["受験", "じゅけん"], ["再受験", "さいじゅけん"], ["面接試験", "めんせつしけん"], ["科目試験", "かもくしけん"], ["筆記試験", "ひっきしけん"], ["作文", "さくぶん"], ["来校入試", "らいこうにゅうし"], ["オンライン入試", "おんらいんにゅうし"], ["合格", "ごうかく"], ["不合格", "ふごうかく"], ["合否発表", "ごうひはっぴょう"], ["定員", "ていいん"], ["併願", "へいがん"], ["専願", "せんがん"], ["入学選抜料", "にゅうがくせんばつりょう"], ["受験料", "じゅけんりょう"]
+        ];
+
+        const phoneticRules = {
+            "よう": ["よ", "うよ", "ゆ"], "しょう": ["しょ", "せい", "じょう"], "ちょう": ["てい", "じゅう", "ちょ"], 
+            "しゅう": ["しゅ", "じゅう"], "がん": ["げん", "ねがい"], "し": ["じ", "こ"], "き": ["けい", "ぎ"],
+            "かく": ["がく", "きゃく"], "りゅう": ["りゅ", "る"], "せん": ["ぜん", "たい"], "じゅ": ["じゅう", "うけ"]
+        };
+
+        let quizData = [];
+        let currentIdx = 0;
+        let score = 0;
+        let quizActive = false;
+        let userRecords = [];
+        let historyData = JSON.parse(localStorage.getItem('vocab_miss_v3') || '{}');
+
+        // 初始化首页错题本
+        window.onload = () => switchMistakeTab(3);
+
+        function switchMistakeTab(level) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-level="${level}"]`).classList.add('active');
+            
+            const listArea = document.getElementById('mistake-list');
+            listArea.innerHTML = '';
+            
+            const filtered = Object.keys(historyData).filter(word => {
+                const count = historyData[word];
+                if (level === 3) return count >= 3;
+                if (level === 2) return count === 2;
+                if (level === 1) return count === 1;
+                return false;
+            });
+
+            if (filtered.length === 0) {
+                listArea.innerHTML = '<div style="grid-column:1/-1; color:#999; text-align:center; font-size:0.8rem; margin-top:20px;">データがありません</div>';
+                return;
+            }
+
+            filtered.forEach(word => {
+                const item = document.createElement('div');
+                item.className = 'mistake-item';
+                item.innerText = word;
+                item.title = "クリックで正解を表示";
+                item.onclick = () => {
+                    const original = item.innerText;
+                    const pair = wordList.find(p => p[0] === word);
+                    item.innerText = pair ? pair[1] : '???';
+                    item.style.color = 'var(--danger-color)';
+                    setTimeout(() => { item.innerText = original; item.style.color = ''; }, 1200);
+                };
+                listArea.appendChild(item);
+            });
+        }
+
+        function startQuiz() {
+            const name = document.getElementById('user-name').value.trim();
+            const sid = document.getElementById('student-id').value.trim();
+            if(!name || !sid) return alert("氏名と学籍番号を入力してください");
+
+            quizData = [...wordList].sort(() => Math.random() - 0.5).slice(0, QUESTION_COUNT);
+            currentIdx = 0; score = 0; userRecords = []; quizActive = true;
+            
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function getSmartOptions(kanji, correct) {
+            let traps = new Set();
+            if(correct.includes("う")) traps.add(correct.replace(/う/g, "")); 
+            if(correct.includes("っ")) traps.add(correct.replace(/っ/g, ""));
+            for (let key in phoneticRules) {
+                if (correct.includes(key)) phoneticRules[key].forEach(alt => traps.add(correct.replace(key, alt)));
+            }
+            if(kanji.endsWith("書")) traps.add(correct.replace("しょ", "き"));
+            if(kanji.endsWith("料")) traps.add(correct.replace("りょう", "りょ"));
+            if(kanji.endsWith("証")) traps.add(correct.replace("しょう", "せい"));
+
+            let finalTraps = Array.from(traps).filter(t => t !== correct && t.length > 0).sort(() => Math.random() - 0.5);
+            let options = [correct, ...finalTraps.slice(0, 3)];
+            while(options.length < 4) {
+                let r = wordList[Math.floor(Math.random()*wordList.length)][1];
+                if(!options.includes(r)) options.push(r);
+            }
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIdx];
+            document.getElementById('q-text').innerText = q[0];
+            document.getElementById('current-q-num').innerText = `Q ${currentIdx + 1} / ${QUESTION_COUNT}`;
+            document.getElementById('progress-bar').style.width = (currentIdx / QUESTION_COUNT * 100) + "%";
+            
+            const options = getSmartOptions(q[0], q[1]);
+            const area = document.getElementById('options-area');
+            area.innerHTML = '';
+            
+            options.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'option-btn';
+                b.innerText = opt;
+                b.onclick = () => check(b, opt, q);
+                area.appendChild(b);
+            });
+        }
+
+        function check(btn, sel, pair) {
+            const ok = (sel === pair[1]);
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach(b => b.disabled = true);
+
+            if(ok) {
+                btn.classList.add('correct');
+                score++;
+                document.getElementById('live-score').innerText = `正解: ${score}`;
+            } else {
+                btn.classList.add('wrong');
+                btns.forEach(b => { if(b.innerText === pair[1]) b.classList.add('correct'); });
+                historyData[pair[0]] = (historyData[pair[0]] || 0) + 1;
+                localStorage.setItem('vocab_miss_v3', JSON.stringify(historyData));
+            }
+
+            userRecords.push({ q: pair[0], ans: pair[1], user: sel, isOk: ok });
+
+            setTimeout(() => {
+                currentIdx++;
+                if(currentIdx < QUESTION_COUNT) renderQuestion();
+                else finish();
+            }, 200); 
+        }
+
+        async function finish() {
+            quizActive = false;
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score} / ${QUESTION_COUNT}`;
+
+            const analysis = document.getElementById('analysis-area');
+            analysis.innerHTML = '';
+            userRecords.forEach(r => {
+                const d = document.createElement('div');
+                d.className = 'result-item';
+                d.innerHTML = `<span class="tag ${r.isOk?'tag-correct':'tag-wrong'}">${r.isOk?'○':'×'}</span> <strong>${r.q}</strong> <small>(${r.ans})</small>`;
+                analysis.appendChild(d);
+            });
+
+            const payload = {
+                timestamp: new Date().toLocaleString('ja-JP'),
+                studentId: document.getElementById('student-id').value,
+                name: document.getElementById('user-name').value,
+                className: document.getElementById('class-name').value,
+                score: score + " / 20"
+            };
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        }
+
+        function clearHistory() {
+            if(confirm("累計ミス記録をリセットしますか？")) {
+                localStorage.removeItem('vocab_miss_v3');
+                historyData = {};
+                switchMistakeTab(3);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && quizActive) {
+                quizActive = false;
+                document.getElementById('cheat-overlay').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
